@@ -46,7 +46,9 @@ class CatFaceCropper:
             i += 1
 
         # Draw a rectangle over each cat face and label it
+        i = 0
         for (x, y, w, h) in faces:
             cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
-            cv2.putText(img, 'Cat ' + str(), (x, y - 7), 3, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+            cv2.putText(img, str(i), (x, y - 7), 3, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+            i += 1
         cv2.imwrite(out_dir + os.sep + filename_raw + "-results" + filename_extension, img)
