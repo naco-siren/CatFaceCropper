@@ -1,5 +1,6 @@
 # -*- coding=utf-8 -*-
 import os
+import imghdr
 import cv2
 
 class CatFaceCropper:
@@ -9,12 +10,21 @@ class CatFaceCropper:
         self.catPath = "haarcascade_frontalcatface.xml"
         self.faceCascade = cv2.CascadeClassifier(self.catPath)
 
-
     def crop_image_dir(self, directory):
         # TODO: Implement this
-        pass
+        for root, dirs, files in os.walk(directory):
+            print("=== Processing " + root + " ...")
+            for f in files:
+                filename = root + os.sep + f
+                if imghdr.what(filename) is not None:
+                    self.crop_image(filename)
+        print("=== Processing complete! ===")
 
     def crop_image(self, filename):
+        # Check if file is image
+        if imghdr.what(filename) is None:
+            return
+
         # Split the path, filename and extension
         (filename_head, filename_tail) = os.path.split(filename)
         (filename_raw, filename_extension) = os.path.splitext(filename_tail)
@@ -23,7 +33,7 @@ class CatFaceCropper:
         img = cv2.imread(filename)
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        # Detect the cat face
+        # Detect the cat faces
         faces = self.faceCascade.detectMultiScale(
             gray,
             scaleFactor=1.02,
@@ -33,7 +43,7 @@ class CatFaceCropper:
         )
 
         # Make an output directory if not exits
-        out_dir = "output"
+        out_dir = filename_head + os.sep + "output"
         if not os.path.exists(out_dir):
             os.makedirs(out_dir)
 
