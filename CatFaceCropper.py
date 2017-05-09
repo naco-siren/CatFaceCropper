@@ -10,17 +10,17 @@ class CatFaceCropper:
         self.catPath = "haarcascade_frontalcatface.xml"
         self.faceCascade = cv2.CascadeClassifier(self.catPath)
 
-    def crop_image_dir(self, directory):
+    def crop_image_dir(self, directory, only_faces):
         # TODO: Implement this
         for root, dirs, files in os.walk(directory):
             print("=== Processing " + root + " ...")
             for f in files:
                 filename = root + os.sep + f
                 if imghdr.what(filename) is not None:
-                    self.crop_image(filename)
+                    self.crop_image(filename, only_faces)
         print("=== Processing complete! ===")
 
-    def crop_image(self, filename):
+    def crop_image(self, filename, only_faces):
         # Check if file is image
         if imghdr.what(filename) is None:
             return
@@ -55,10 +55,11 @@ class CatFaceCropper:
             cv2.imwrite(out_dir + os.sep + filename_raw + "-" + str(i) + filename_extension, img_sub)
             i += 1
 
-        # Draw a rectangle over each cat face and label it
-        i = 0
-        for (x, y, w, h) in faces:
-            cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
-            cv2.putText(img, str(i), (x, y - 7), 3, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
-            i += 1
-        cv2.imwrite(out_dir + os.sep + filename_raw + "-results" + filename_extension, img)
+        if not only_faces:
+            # Draw a rectangle over each cat face and label it
+            i = 0
+            for (x, y, w, h) in faces:
+                cv2.rectangle(img, (x, y), (x + w, y + h), (0, 0, 255), 2)
+                cv2.putText(img, str(i), (x, y - 7), 3, 1.2, (0, 255, 0), 2, cv2.LINE_AA)
+                i += 1
+            cv2.imwrite(out_dir + os.sep + filename_raw + "-results" + filename_extension, img)
